@@ -5,7 +5,7 @@ Este repositório contém a implementação do projeto **FTCP (File Transfer Cus
 ## Equipe
 
 *   **Integrante 1:** Aline Brito Maracajá
-*   **Integrante 2:** Daniele de Oliveira
+*   **Integrante 2:** Daniele de Oliveira Sousa
 *   **Integrante 3:** Gabrielly de Souza Lima
 *   **Integrante 3:** Maria Clara Oliveira Guedes
 
