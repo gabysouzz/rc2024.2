@@ -1,0 +1,3 @@
+teste de comunicacao: arquivo B
+
+olaaa, tudo bem, e com voce?
