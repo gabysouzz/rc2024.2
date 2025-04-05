@@ -8,9 +8,7 @@ Este repositório contém a implementação do projeto **FTCP (File Transfer Cus
 *   **Integrante 2:** Daniele de Oliveira Sousa
 *   **Integrante 3:** Gabrielly de Souza Lima
 *   **Integrante 4:** Maria Clara Oliveira Guedes
-
-*   *(Adicione mais linhas conforme necessário)*
-
+  
 ## Visão Geral do Projeto
 
 O objetivo principal é desenvolver um cliente e um servidor que se comunicam através de um protocolo próprio (FTCP). A negociação inicial ocorre via UDP, onde o cliente requisita um arquivo (`a.txt` ou `b.txt`) e especifica o protocolo de transferência (obrigatoriamente TCP nesta versão). O servidor responde com a porta TCP designada para a transferência. Em seguida, o cliente estabelece uma conexão TCP nessa porta, solicita o arquivo, o recebe e confirma o recebimento antes de encerrar a conexão.
