@@ -1,3 +1,15 @@
+"""
+Cliente UDP/TCP para transferência de arquivos.
+
+Este código implementa um cliente responsável por solicitar um arquivo a um servidor. 
+Inicialmente, ele se comunica com o servidor utilizando o protocolo UDP, enviando uma 
+mensagem que contém o nome do arquivo desejado e o protocolo a ser utilizado para transferência 
+(fixado como TCP). Após receber do servidor a indicação de uma porta TCP disponível, o cliente 
+estabelece uma conexão TCP com essa porta. Por meio dessa conexão, ele recebe o conteúdo do arquivo 
+solicitado e o armazena localmente. 
+"""
+
+
 import os
 import socket
 import configparser
