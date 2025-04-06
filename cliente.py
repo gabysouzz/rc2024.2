@@ -1,52 +1,58 @@
-import configparser
 import os
 import socket
+import configparser
 
-# Carrega configurações
+
+#Configuraçoes iniciais
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
 
+#Extrai os dados do config.ini
 tcp_port_start = int(config['SERVER']['TCP_PORT_START'])
 tcp_port_end = int(config['SERVER']['TCP_PORT_END'])
 udp_port = int(config['SERVER']['UDP_PORT'])
 file_a = config['SERVER']['FILE_A']
 file_b = config['SERVER']['FILE_B']
 
-# Exibe configuração
-print(f"Cliente configurado com TCP_PORT_START={tcp_port_start}, TCP_PORT_END={tcp_port_end} e UDP_PORT={udp_port}")
+print(f"[CONFIG] Cliente configurado com TCP_PORT_START={tcp_port_start}, TCP_PORT_END={tcp_port_end}, UDP_PORT={udp_port}")
 
 # Entrada do usuário
-nome_arquivo = input("Digite o nome do arquivo (a.txt ou b.txt): ").strip()
+name_file = input("Digite o nome do arquivo (a.txt ou b.txt): ").strip()
 
-# Protocolo fixo "TCP" (por enquanto)
-protocolo = "TCP"
-mensagem = f"{nome_arquivo},{protocolo}"
+# Fixa o protocolo: TCP
+protocol = "TCP"
+message = f"{name_file},{protocol}"
 
-# Cria e envia UDP
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.sendto(mensagem.encode(), ('localhost', udp_port))
+# Negociação inicial via UDP
+udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_sock.sendto(message.encode(), ('localhost', udp_port))
+print(f"[UDP] Mensagem enviada: {message}")
 
-# Aguarda resposta com a porta TCP
-resposta, _ = sock.recvfrom(1024)
-resposta = resposta.decode().strip()
+# Recebe a porta TCP do servidor como resposta
+response, _ = udp_sock.recvfrom(1024)
+response = response.decode().strip()
 
-if resposta.startswith("ERRO"):
-    print(f"[UDP] Erro recebido: {resposta}")
+if response.startswith("ERRO"):
+    print(f"[UDP] Erro: {response}")
 else:
-    porta_tcp = int(resposta)
-    print(f"Cliente recebeu porta TCP para continuar a conexão: {porta_tcp}")
+    tcp_port = int(response)
+    print(f"[UDP] Porta TCP recebida: {tcp_port}")
 
-    # Conecta via TCP para baixar o arquivo
+    # Estabelece conexão TCP para baixar o arquivo
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_sock:
-        tcp_sock.connect(('localhost', porta_tcp))
+        tcp_sock.connect(('localhost', tcp_port))
+        print(f"[TCP] Conectado ao servidor na porta {tcp_port}")
+
         dados = b""
         while True:
-            parte = tcp_sock.recv(1024)
-            if not parte:
+            piece = tcp_sock.recv(1024)
+            if not piece:
                 break
-            dados += parte
+            data += piece
 
-    # Salva o arquivo localmente
-    with open(f"recebido_{nome_arquivo}", 'wb') as f:
-        f.write(dados)
-    print(f"[TCP] Arquivo {nome_arquivo} salvo como recebido_{nome_arquivo}")
+    # Salva o arquivo de forma local
+    name_file_local = f"recebido_{name_file}"
+    with open(name_file_local, 'wb') as f:
+        f.write(data)
+
+    print(f"[TCP] Arquivo recebido e salvo como {name_file_local}")
