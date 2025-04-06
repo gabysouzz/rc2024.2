@@ -55,7 +55,7 @@ else:
         tcp_sock.connect(('localhost', tcp_port))
         print(f"[TCP] Conectado ao servidor na porta {tcp_port}")
 
-        dados = b""
+        data = b""
         while True:
             piece = tcp_sock.recv(1024)
             if not piece:
