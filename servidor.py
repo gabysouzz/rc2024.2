@@ -43,9 +43,14 @@ def handle_tcp_connection(porta: int, caminho_arquivo: str):
         conn, addr = tcp_sock.accept()
         print(f"[TCP] Conexão recebida de {addr}")
         with conn:
-            with open(caminho_arquivo, 'rb') as f:
-                conn.sendall(f.read())
-            print(f"[TCP] Arquivo {os.path.basename(caminho_arquivo)} enviado para {addr}")
+            try:
+                with open(caminho_arquivo, 'rb') as f:
+                    conn.sendall(f.read())
+                print(f"[TCP] Arquivo {os.path.basename(caminho_arquivo)} enviado para {addr}")
+            except FileNotFoundError:
+                erro_msg = f"[TCP] ERRO: Arquivo {caminho_arquivo} não encontrado!"
+                print(erro_msg)
+                conn.sendall(erro_msg.encode())
 
 # Inicializa a próxima porta TCP disponível
 proxima_porta_tcp = tcp_port_start
@@ -64,12 +69,18 @@ while True:
     try:
         nome_arquivo, protocolo = mensagem.split(",")
 
-        # Valida o nome do arquivo solicitado
-        if nome_arquivo not in [os.path.basename(file_a), os.path.basename(file_b)]:
-            resposta = "ERRO: Arquivo inválido"
+        if nome_arquivo == os.path.basename(file_a):
+            caminho_do_arquivo = file_a
+        elif nome_arquivo == os.path.basename(file_b):
+            caminho_do_arquivo = file_b
+        else:
+            resposta = "ERRO: Arquivo não encontrado"
+            sock.sendto(resposta.encode(), endereco)
+            print(f"[UDP] Resposta enviada para {endereco}: {resposta}")
+            continue
         
         # Valida o protocolo (apenas o TCP suportado)
-        elif protocolo.strip().upper() != "TCP":
+        if protocolo.strip().upper() != "TCP":
             resposta = "ERRO: Apenas protocolo TCP é suportado nesta versão"
         
         # Verifica se há portas TCP que estão disponíveis
