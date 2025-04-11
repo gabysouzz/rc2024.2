@@ -1,0 +1,3 @@
+teste de comunicacao: arquivo A
+
+olaaa, tudo bem?
