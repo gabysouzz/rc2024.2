@@ -43,6 +43,8 @@ else:
         tcp_sock.connect(('localhost', tcp_port))
         print(f"[TCP] Conectado ao servidor na porta {tcp_port}")
 
+        tcp_sock.sendall(f"GET {name_file}\r\n".encode())
+
         data = b""
         while True:
             piece = tcp_sock.recv(1024)

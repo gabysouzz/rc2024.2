@@ -23,31 +23,41 @@ def handle_tcp_connection(porta_tcp, caminho_arquivo):
         print(f"[TCP] Escutando na porta {porta_tcp} para enviar {os.path.basename(caminho_arquivo)}")
 
         conn, endereco = tcp_sock.accept()
-        with conn:
-            print(f"[TCP] Conexão recebida de {endereco}")
 
-            # Envia o arquivo
-            with open(caminho_arquivo, 'rb') as f:
-                while True:
-                    dados = f.read(1024)
-                    if not dados:
-                        break
-                    conn.sendall(dados)
-            # Aqui: marca de fim de transmissão
-            conn.sendall(b"<<EOF>>")
-            
-            print(f"[TCP] Arquivo {os.path.basename(caminho_arquivo)} enviado para {endereco}")
+        comando = conn.recv(1024).decode().strip()
+        if comando.startswith("GET"):
+            arquivo_solicitado = comando.split()[1]
+            if arquivo_solicitado != os.path.basename(caminho_arquivo): 
+                conn.sendall(b"ERRO: Arquivo solicitado nao corresponde")
+                return
 
-            # Espera pelo ACK com timeout
-            conn.settimeout(5.0)
-            try:
-                ack = conn.recv(1024)
-                if ack and ack.decode().strip() == "FTCP_ACK":
-                    print(f"[TCP] FTCP_ACK recebido de {endereco}")
-                else:
-                    print(f"[TCP] ACK inválido de {endereco}: {ack}")
-            except socket.timeout:
-                print(f"[TCP] Nenhum ACK recebido de {endereco} (timeout)")
+            with conn:
+                print(f"[TCP] Conexão recebida de {endereco}")
+
+                # Envia o arquivo
+                with open(caminho_arquivo, 'rb') as f:
+                    while True:
+                        dados = f.read(1024)
+                        if not dados:
+                            break
+                        conn.sendall(dados)
+                # Aqui: marca de fim de transmissão
+                conn.sendall(b"<<EOF>>")
+                
+                print(f"[TCP] Arquivo {os.path.basename(caminho_arquivo)} enviado para {endereco}")
+
+                # Espera pelo ACK com timeout
+                conn.settimeout(5.0)
+                try:
+                    ack = conn.recv(1024)
+                    if ack and ack.decode().strip() == "FTCP_ACK":
+                        print(f"[TCP] FTCP_ACK recebido de {endereco}")
+                    else:
+                        print(f"[TCP] ACK inválido de {endereco}: {ack}")
+                except socket.timeout:
+                    print(f"[TCP] Nenhum ACK recebido de {endereco} (timeout)")
+                finally:
+                    conn.close()
 
 # Inicializa a próxima porta TCP disponível
 proxima_porta_tcp = tcp_port_start
