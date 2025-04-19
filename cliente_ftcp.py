@@ -46,7 +46,15 @@ response = response.decode().strip()
 if response.startswith("ERRO"):
     print(f"[UDP] Erro: {response}")
 else:
-    tcp_port = int(response)
+    if response.startswith("RESPONSE,TCP"):
+        partes = response.split(',')
+        if len(partes) == 4:
+            tcp_port = int(partes[2])
+        else:
+            print("[UDP] Erro: Formato de resposta inválido.")
+            udp_sock.close()
+            exit(1)
+
     print(f"[UDP] Porta TCP recebida: {tcp_port}")
 
     time.sleep(0.5)  # Espera o servidor abrir a porta

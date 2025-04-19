@@ -98,7 +98,7 @@ while True:
         mensagem = mensagem.strip()
         partes = mensagem.split()
         if len(partes) != 3 or partes[0].upper() != "REQUEST":
-            resposta = "ERRO: Formato de requisição inválido. Use: REQUEST <arquivo> <protocolo>"
+            resposta = "ERRO, Formato de requisição inválido. Use: REQUEST <arquivo> <protocolo>"
             sock.sendto(resposta.encode(), endereco)
             continue
 
@@ -109,21 +109,20 @@ while True:
         elif nome_arquivo == os.path.basename(file_b):
             caminho_do_arquivo = file_b
         else:
-            resposta = "ERRO: Arquivo não encontrado"
+            resposta = "ERRO, Arquivo não encontrado"
             sock.sendto(resposta.encode(), endereco)
             print(f"[UDP] Resposta enviada para {endereco}: {resposta}")
             continue
 
         if protocolo.strip().upper() != "TCP":
-            resposta = "ERRO: Apenas protocolo TCP é suportado nesta versão"
+            resposta = "ERRO, Apenas protocolo TCP é suportado nesta versão"
 
         elif proxima_porta_tcp > tcp_port_end:
-            resposta = "ERRO: Nenhuma porta TCP disponível"
+            resposta = "ERRO, Nenhuma porta TCP disponível"
 
         else:
             resposta = str(proxima_porta_tcp)
             porta_tcp = proxima_porta_tcp
-            proxima_porta_tcp += 1
 
             # Inicia a thread para envio com TCP
             threading.Thread(
@@ -131,9 +130,11 @@ while True:
                 args=(porta_tcp, caminho_do_arquivo),
                 daemon=True
             ).start()
+            resposta = f"RESPONSE,TCP,{proxima_porta_tcp},{nome_arquivo}"
+            proxima_porta_tcp += 1
 
     except Exception as e:
-        resposta = f"ERRO: Formato de mensagem inválido ({str(e)})"
+        resposta = f"ERRO, Formato de mensagem inválido ({str(e)})"
 
     sock.sendto(resposta.encode(), endereco)
     print(f"[UDP] Resposta enviada para {endereco}: {resposta}")
