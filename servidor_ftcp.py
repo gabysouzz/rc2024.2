@@ -1,3 +1,12 @@
+"""
+Servidor UDP/TCP para envio de arquivos.
+
+Este servidor escuta por requisições UDP contendo o nome de um arquivo e o protocolo desejado.
+Caso o protocolo seja TCP e o arquivo seja válido, o servidor responde com uma porta TCP para conexão.
+Em seguida, envia o conteúdo do arquivo por uma conexão TCP.
+
+Configurações de porta e arquivos são lidas a partir do arquivo config.ini.
+"""
 import configparser
 import os
 import socket
@@ -50,10 +59,22 @@ def handle_tcp_connection(porta_tcp, caminho_arquivo):
                 conn.settimeout(5.0)
                 try:
                     ack = conn.recv(1024)
-                    if ack and ack.decode().strip() == "FTCP_ACK":
-                        print(f"[TCP] FTCP_ACK recebido de {endereco}")
-                    else:
-                        print(f"[TCP] ACK inválido de {endereco}: {ack}")
+                    if ack:
+                        ack_decodificado = ack.decode().strip()
+                        if ack_decodificado.startswith("FTCP_ACK"):
+                            partes = ack_decodificado.split(',')
+                            if len(partes) == 2:
+                                try:
+                                    num_bytes = int(partes[1])
+                                    print(f"[TCP] FTCP_ACK recebido de {endereco} com {num_bytes} bytes confirmados.")
+                                except ValueError:
+                                    print(f"[TCP] FTCP_ACK recebido de {endereco}, mas número inválido: {partes[1]}")
+                            elif ack_decodificado == "FTCP_ACK":
+                                print(f"[TCP] FTCP_ACK simples recebido de {endereco}")
+                            else:
+                                print(f"[TCP] Formato inesperado no ACK de {endereco}: {ack_decodificado}")
+                        else:
+                            print(f"[TCP] ACK inválido de {endereco}: {ack_decodificado}")
                 except socket.timeout:
                     print(f"[TCP] Nenhum ACK recebido de {endereco} (timeout)")
                 finally:

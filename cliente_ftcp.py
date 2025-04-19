@@ -1,3 +1,14 @@
+"""
+Cliente UDP/TCP para transferência de arquivos.
+ 
+Este código implementa um cliente responsável por solicitar um arquivo a um servidor. 
+Inicialmente, ele se comunica com o servidor utilizando o protocolo UDP, enviando uma 
+mensagem que contém o nome do arquivo desejado e o protocolo a ser utilizado para transferência 
+(fixado como TCP). Após receber do servidor a indicação de uma porta TCP disponível, o cliente 
+estabelece uma conexão TCP com essa porta. Por meio dessa conexão, ele recebe o conteúdo do arquivo 
+solicitado e o armazena localmente. 
+"""
+
 import os
 import socket
 import configparser
@@ -61,10 +72,11 @@ else:
         # Dá um tempo antes de enviar ACK (não fecha a conexão ainda!)
         time.sleep(0.2)
 
-        # Envia ACK
+        # Envia ACK com número de bytes
         try:
-            tcp_sock.sendall(b"FTCP_ACK")
-            print("[TCP] FTCP_ACK enviado ao servidor.")
+            ack_message = f"FTCP_ACK,{len(data)}"
+            tcp_sock.sendall(ack_message.encode())
+            print(f"[TCP] {ack_message} enviado ao servidor.")
             time.sleep(0.5)  # Mantém conexão viva após ACK
         except Exception as e:
             print(f"[TCP] Erro ao enviar FTCP_ACK: {e}")
