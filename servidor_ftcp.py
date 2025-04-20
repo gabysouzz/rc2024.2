@@ -109,16 +109,16 @@ while True:
         elif nome_arquivo == os.path.basename(file_b):
             caminho_do_arquivo = file_b
         else:
-            resposta = "ERRO, Arquivo não encontrado"
+            resposta = "ERROR, ARQUIVO NAO ENCONTRADO"
             sock.sendto(resposta.encode(), endereco)
             print(f"[UDP] Resposta enviada para {endereco}: {resposta}")
             continue
 
         if protocolo.strip().upper() != "TCP":
-            resposta = "ERRO, Apenas protocolo TCP é suportado nesta versão"
+            resposta = "ERROR, PROTOCOLO INVÁLIDO,,"
 
         elif proxima_porta_tcp > tcp_port_end:
-            resposta = "ERRO, Nenhuma porta TCP disponível"
+            resposta = "ERROR, Nenhuma porta TCP disponível"
 
         else:
             resposta = str(proxima_porta_tcp)

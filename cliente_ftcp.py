@@ -43,7 +43,7 @@ print(f"[UDP] Mensagem enviada: {message}")
 response, _ = udp_sock.recvfrom(1024)
 response = response.decode().strip()
 
-if response.startswith("ERRO"):
+if response.startswith("ERROR"):
     print(f"[UDP] Erro: {response}")
 else:
     if response.startswith("RESPONSE,TCP"):
